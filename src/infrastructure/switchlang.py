@@ -1,15 +1,15 @@
 import uuid
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 
 
 class switch:
-    _no_results = uuid.uuid4()
-    _default = uuid.uuid4()
+    __no_result = uuid.uuid4()
+    __default = uuid.uuid4()
 
     def __init__(self, value):
         self.value = value
         self.cases = set()
-        set._found = False
+        self._found = False
         self.__result = switch.__no_result
         self._falling_through = False
         self._func_stack = []
@@ -28,7 +28,7 @@ class switch:
         """
         self.case(switch.__default, func)
 
-    def case(self, key, func: Callable[[], Any], fallthrough=False):
+    def case(self, key, func: Callable[[], Any], fallthrough: Optional[bool] = False):
         """
             Specify a case for the switch block:
 
@@ -78,9 +78,9 @@ class switch:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_val:
             raise exc_val
-        
+
         if not self._func_stack:
-            return Exception("Value does not match any case and there "
+            raise Exception("Value does not match any case and there "
                             "is no default case: value {}".format(self.value))
 
         for func in self._func_stack:
@@ -89,11 +89,11 @@ class switch:
 
     @property
     def result(self):
-         if self.__result == switch.__no_result:
+        if self.__result == switch.__no_result:
             raise Exception("No result has been computed (did you access "
                             "switch.result inside the with block?)")
-            
-            return self.__result
+
+        return self.__result
 
 
 def closed_range(start: int, stop: int, step=1) -> range:
